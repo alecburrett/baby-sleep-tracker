@@ -131,15 +131,22 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Baby Sleep Tracker</h1>
+      <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100">
+        <div className="max-w-4xl mx-auto px-6 py-5 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+              <span className="text-xl">✨</span>
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Sleep Tracker
+            </h1>
+          </div>
           <form action={logout}>
             <button
               type="submit"
-              className="text-sm text-gray-600 hover:text-gray-900"
+              className="px-4 py-2 rounded-full text-sm font-medium text-purple-600 hover:bg-purple-100 transition-colors"
             >
               Sign out
             </button>
@@ -148,116 +155,145 @@ export default function DashboardClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Child Info Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">{child.name}</h2>
-              <p className="text-gray-600">{ageInMonths} months old</p>
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        {/* Child Profile Card */}
+        <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 flex items-center justify-center border-4 border-white shadow-lg">
+              <span className="text-4xl">👶</span>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-gray-800">{child.name}</h2>
+              <p className="text-purple-600 font-medium">{ageInMonths} months old</p>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-purple-600">{todaysSleepHours}h</div>
+              <p className="text-xs text-gray-500">today</p>
             </div>
           </div>
         </div>
 
-        {/* Sleep Tracking Card */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+        {/* Sleep Status Card */}
+        <div className={`rounded-3xl shadow-lg p-8 mb-6 border-4 ${
+          activeSleepSession
+            ? 'bg-gradient-to-br from-blue-100 to-blue-200 border-blue-300'
+            : 'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-300'
+        }`}>
           <div className="text-center">
+            <div className="mb-4">
+              <span className="text-7xl drop-shadow-lg">
+                {activeSleepSession ? '😴' : '🌟'}
+              </span>
+            </div>
+
             {activeSleepSession ? (
               <>
-                <div className="mb-4">
-                  <span className="text-6xl">😴</span>
+                <h3 className="text-3xl font-bold text-blue-900 mb-2">Sleeping...</h3>
+                <p className="text-blue-700 mb-1">Since {formatTime(activeSleepSession.start_time)}</p>
+                <div className="inline-block bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
+                  <p className="text-2xl font-bold text-blue-600">{currentSleepDuration}</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Sleeping</h3>
-                <p className="text-gray-600 mb-1">
-                  Since {formatTime(activeSleepSession.start_time)}
-                </p>
-                <p className="text-lg font-semibold text-indigo-600 mb-6">
-                  {currentSleepDuration}
-                </p>
               </>
             ) : (
               <>
-                <div className="mb-4">
-                  <span className="text-6xl">👶</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Awake</h3>
-                <p className="text-gray-600 mb-6">Tap below to start tracking sleep</p>
+                <h3 className="text-3xl font-bold text-purple-900 mb-2">Awake & Happy</h3>
+                <p className="text-purple-700 mb-6">Ready to track the next sleep</p>
               </>
             )}
 
             <button
               onClick={handleSleepToggle}
               disabled={loading}
-              className={`w-full max-w-md py-4 px-8 rounded-lg text-xl font-semibold text-white transition-colors ${
+              className={`w-full py-5 px-8 rounded-full text-xl font-bold text-white shadow-xl transition-all transform hover:scale-105 active:scale-95 ${
                 activeSleepSession
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-indigo-600 hover:bg-indigo-700'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  ? 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600'
+                  : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+              } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
             >
               {loading
-                ? 'Processing...'
+                ? '⏳ Processing...'
                 : activeSleepSession
-                ? 'Wake Up'
-                : 'Start Sleep'}
+                ? '✓ Wake Up'
+                : '+ Start Sleep'}
             </button>
           </div>
         </div>
 
-        {/* Today's Summary */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Today's Sleep</h3>
-          <div className="text-3xl font-bold text-indigo-600 mb-4">
-            {todaysSleepHours}h
-          </div>
+        {/* Today's Sessions */}
+        {todaySessions.length > 0 && (
+          <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                <span className="text-lg">📋</span>
+              </div>
+              <h3 className="text-lg font-bold text-gray-800">Today's Sessions</h3>
+            </div>
 
-          {todaySessions.length > 0 && (
-            <div className="space-y-2">
-              {todaySessions.map((session) => (
+            <div className="space-y-3">
+              {todaySessions.map((session, idx) => (
                 <div
                   key={session.id}
-                  className="flex justify-between items-center py-2 border-t"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100"
                 >
-                  <div>
-                    <span className="text-gray-700">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    session.end_time
+                      ? 'bg-gradient-to-br from-blue-400 to-blue-500'
+                      : 'bg-gradient-to-br from-orange-400 to-orange-500'
+                  }`}>
+                    <span className="text-xl">{session.end_time ? '✓' : '⏱️'}</span>
+                  </div>
+
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-800">
+                      {session.end_time
+                        ? formatDuration(session.start_time, session.end_time)
+                        : 'In progress'}
+                    </p>
+                    <p className="text-sm text-gray-600">
                       {formatTime(session.start_time)}
                       {session.end_time && ` - ${formatTime(session.end_time)}`}
-                    </span>
+                    </p>
                   </div>
-                  <div className="text-gray-600">
-                    {session.end_time
-                      ? formatDuration(session.start_time, session.end_time)
-                      : 'In progress'}
+
+                  <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <span className="text-lg">⭐</span>
                   </div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {todaySessions.length === 0 && (
-            <p className="text-gray-500 text-sm">No sleep sessions recorded yet today</p>
-          )}
-        </div>
+        {todaySessions.length === 0 && !activeSleepSession && (
+          <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-8 mb-6 text-center">
+            <span className="text-5xl mb-4 block">🌙</span>
+            <p className="text-gray-500">No sleep sessions yet today</p>
+            <p className="text-sm text-gray-400 mt-1">Tap the button above to start tracking</p>
+          </div>
+        )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => router.push('/dashboard/history')}
-            className="bg-white rounded-lg shadow-md p-6 text-left hover:shadow-lg transition-shadow"
+            className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 text-center hover:shadow-md hover:border-purple-200 transition-all"
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              📊 View History
-            </h3>
-            <p className="text-gray-600 text-sm">See past sleep patterns and trends</p>
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">📊</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-1">History</h3>
+            <p className="text-xs text-gray-500">View patterns</p>
           </button>
 
           <button
             onClick={() => router.push('/dashboard/insights')}
-            className="bg-white rounded-lg shadow-md p-6 text-left hover:shadow-lg transition-shadow"
+            className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 text-center hover:shadow-md hover:border-purple-200 transition-all"
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              💡 AI Insights
-            </h3>
-            <p className="text-gray-600 text-sm">Get personalized recommendations</p>
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">💡</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-1">AI Insights</h3>
+            <p className="text-xs text-gray-500">Get tips</p>
           </button>
         </div>
       </main>
