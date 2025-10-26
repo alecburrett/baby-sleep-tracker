@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { logout } from '@/app/actions/auth'
 import { Database } from '@/lib/types/database'
 
@@ -50,8 +50,14 @@ export default function DashboardClient({
   const [currentSleepDuration, setCurrentSleepDuration] = useState('')
 
   // Update current sleep duration every minute
-  if (activeSleepSession) {
+  useEffect(() => {
+    if (!activeSleepSession) {
+      setCurrentSleepDuration('')
+      return
+    }
+
     const startTime = new Date(activeSleepSession.start_time)
+
     const updateDuration = () => {
       const now = new Date()
       const durationMinutes = Math.floor((now.getTime() - startTime.getTime()) / (1000 * 60))
@@ -59,10 +65,16 @@ export default function DashboardClient({
       const mins = durationMinutes % 60
       setCurrentSleepDuration(hours > 0 ? `${hours}h ${mins}m` : `${mins}m`)
     }
+
+    // Update immediately
     updateDuration()
+
+    // Update every minute
     const interval = setInterval(updateDuration, 60000)
-    setTimeout(() => clearInterval(interval), 0)
-  }
+
+    // Cleanup on unmount or when activeSleepSession changes
+    return () => clearInterval(interval)
+  }, [activeSleepSession])
 
   const handleSleepToggle = async () => {
     setLoading(true)
