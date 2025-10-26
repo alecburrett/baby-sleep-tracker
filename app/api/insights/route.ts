@@ -199,8 +199,15 @@ Focus on: wake windows, nap timing, bedtime optimization, and age-appropriate sl
     })
   } catch (error) {
     console.error('Error generating insights:', error)
+
+    // Provide more specific error message
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate insights'
+
     return NextResponse.json(
-      { error: 'Failed to generate insights' },
+      {
+        error: errorMessage,
+        details: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     )
   }
