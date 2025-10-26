@@ -134,11 +134,12 @@ export async function GET(request: Request) {
     }
 
     // Generate AI recommendations
-    const anthropic = new Anthropic({
-      apiKey: anthropicKey,
-    })
+    try {
+      const anthropic = new Anthropic({
+        apiKey: anthropicKey,
+      })
 
-    const prompt = `You are a pediatric sleep consultant. Analyze this baby's sleep data and provide 3-4 actionable, evidence-based recommendations.
+      const prompt = `You are a pediatric sleep consultant. Analyze this baby's sleep data and provide 3-4 actionable, evidence-based recommendations.
 
 Child Age: ${ageInMonths} months old
 Sleep Data (Past 7 days):
@@ -158,22 +159,31 @@ Please provide recommendations in this exact JSON format:
 
 Focus on: wake windows, nap timing, bedtime optimization, and age-appropriate sleep patterns. Be specific and actionable.`
 
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
-    })
+      const message = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+      })
 
-    // Parse AI response
-    const aiText = message.content[0].type === 'text' ? message.content[0].text : ''
-    let recommendations
+      // Parse AI response
+      const aiText = message.content[0].type === 'text' ? message.content[0].text : ''
+      let recommendations
 
-    try {
-      // Try to extract JSON from response
-      const jsonMatch = aiText.match(/\[[\s\S]*\]/)
-      if (jsonMatch) {
-        recommendations = JSON.parse(jsonMatch[0])
-      } else {
+      try {
+        // Try to extract JSON from response
+        const jsonMatch = aiText.match(/\[[\s\S]*\]/)
+        if (jsonMatch) {
+          recommendations = JSON.parse(jsonMatch[0])
+        } else {
+          recommendations = [
+            {
+              title: 'AI Analysis',
+              description: aiText,
+              confidence: 'medium',
+            },
+          ]
+        }
+      } catch {
         recommendations = [
           {
             title: 'AI Analysis',
@@ -182,21 +192,29 @@ Focus on: wake windows, nap timing, bedtime optimization, and age-appropriate sl
           },
         ]
       }
-    } catch {
-      recommendations = [
-        {
-          title: 'AI Analysis',
-          description: aiText,
-          confidence: 'medium',
-        },
-      ]
-    }
 
-    return NextResponse.json({
-      patterns,
-      recommendations,
-      aiEnabled: true,
-    })
+      return NextResponse.json({
+        patterns,
+        recommendations,
+        aiEnabled: true,
+      })
+    } catch (aiError: any) {
+      // Handle Anthropic API errors (like no credits) gracefully
+      console.error('Anthropic API error:', aiError)
+
+      // Return pattern analysis without AI recommendations
+      return NextResponse.json({
+        patterns,
+        recommendations: [
+          {
+            title: 'AI Credits Required',
+            description: 'To get AI-powered personalized recommendations, add credits to your Anthropic account at https://console.anthropic.com/settings/billing\n\nYour sleep pattern analysis is shown above - review your baby\'s wake windows and sleep duration to identify opportunities for improvement.',
+            confidence: 'high',
+          },
+        ],
+        aiEnabled: false,
+      })
+    }
   } catch (error) {
     console.error('Error generating insights:', error)
 
