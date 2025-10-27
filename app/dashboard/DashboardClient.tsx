@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { logout } from '@/app/actions/auth'
 import { Database } from '@/lib/types/database'
-import FAB from '../components/FAB'
-import NextActionCard from '../components/NextActionCard'
-import InsightsWidget from '../components/InsightsWidget'
-import ProgressIndicators from '../components/ProgressIndicators'
+import FAB from '@/app/components/FAB'
+import NextActionCard from '@/app/components/NextActionCard'
+import InsightsWidget from '@/app/components/InsightsWidget'
+import ProgressIndicators from '@/app/components/ProgressIndicators'
 
 type Child = Database['public']['Tables']['children']['Row']
 type SleepSession = Database['public']['Tables']['sleep_sessions']['Row']
@@ -180,6 +180,23 @@ export default function DashboardClient({
           activeSleepSession={activeSleepSession}
           childAgeInMonths={ageInMonths}
         />
+
+        {/* Main Sleep Tracking Button - Prominent */}
+        <button
+          onClick={handleSleepToggle}
+          disabled={loading}
+          className={`w-full py-6 px-8 rounded-full text-xl font-bold text-white transition-all transform hover:scale-105 active:scale-95 mb-6 shadow-2xl ${
+            activeSleepSession
+              ? 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600'
+              : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 animate-pulse'
+          } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:animate-none`}
+        >
+          {loading
+            ? '⏳ Processing...'
+            : activeSleepSession
+            ? '✓ End Sleep Session'
+            : '+ Start Sleep Session'}
+        </button>
 
         {/* Progress Indicators */}
         <ProgressIndicators
