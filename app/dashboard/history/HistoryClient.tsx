@@ -93,77 +93,127 @@ export default function HistoryClient({ child, sleepSessions }: Props) {
   return (
     <div className="space-y-6">
       {/* Weekly Sleep Chart */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Sleep Duration - Last 7 Days
-        </h2>
+      <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center">
+            <span className="text-xl">📊</span>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Sleep Duration - Last 7 Days
+          </h2>
+        </div>
 
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis label={{ value: 'Hours', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Bar dataKey="hours" fill="#4F46E5" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E9D5FF" />
+              <XAxis dataKey="date" style={{ fontSize: '12px', fill: '#6B7280' }} />
+              <YAxis
+                label={{ value: 'Hours', angle: -90, position: 'insideLeft', style: { fill: '#6B7280' } }}
+                style={{ fontSize: '12px', fill: '#6B7280' }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '2px solid #E9D5FF',
+                  borderRadius: '16px',
+                  padding: '8px 12px'
+                }}
+              />
+              <Bar
+                dataKey="hours"
+                fill="url(#colorGradient)"
+                radius={[16, 16, 0, 0]}
+              />
+              <defs>
+                <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#A78BFA" />
+                  <stop offset="100%" stopColor="#EC4899" />
+                </linearGradient>
+              </defs>
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-gray-500 text-center py-8">
-            No sleep data available yet. Start tracking to see trends!
-          </p>
+          <div className="text-center py-12">
+            <span className="text-5xl mb-3 block">📈</span>
+            <p className="text-gray-500">No sleep data available yet</p>
+            <p className="text-sm text-gray-400 mt-1">Start tracking to see trends!</p>
+          </div>
         )}
       </div>
 
       {/* Wake Windows */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Wake Windows</h2>
+      <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center">
+            <span className="text-xl">⏰</span>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">Wake Windows</h2>
+        </div>
 
-        <div className="mb-4">
-          <div className="text-3xl font-bold text-indigo-600">
+        <div className="mb-6 p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100">
+          <div className="text-4xl font-bold text-purple-600 mb-1">
             {formatWakeWindow(averageWakeWindow)}
           </div>
-          <p className="text-gray-600 text-sm">Average wake window</p>
+          <p className="text-gray-600 text-sm font-medium">Average wake window</p>
         </div>
 
         {wakeWindows.length > 0 && (
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="space-y-3 max-h-64 overflow-y-auto">
             {wakeWindows.slice(-10).reverse().map((window, index) => (
               <div
                 key={index}
-                className="flex justify-between items-center py-2 border-t text-sm"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100"
               >
-                <span className="text-gray-700">
-                  {formatTime(window.start)} → {formatTime(window.end)}
-                </span>
-                <span className="font-semibold text-gray-900">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">👁️</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">
+                    {formatTime(window.start)} → {formatTime(window.end)}
+                  </p>
+                </div>
+                <div className="font-bold text-blue-600">
                   {formatWakeWindow(window.duration)}
-                </span>
+                </div>
               </div>
             ))}
           </div>
         )}
 
         {wakeWindows.length === 0 && (
-          <p className="text-gray-500 text-sm">
-            Track at least 2 sleep sessions to see wake windows
-          </p>
+          <div className="text-center py-8">
+            <span className="text-4xl mb-3 block">🌅</span>
+            <p className="text-gray-500 text-sm">
+              Track at least 2 sleep sessions to see wake windows
+            </p>
+          </div>
         )}
       </div>
 
       {/* All Sleep Sessions */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">All Sleep Sessions</h2>
+      <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+            <span className="text-xl">📋</span>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">All Sleep Sessions</h2>
+        </div>
 
         {sleepSessions.length > 0 ? (
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="space-y-3 max-h-96 overflow-y-auto">
             {sleepSessions.map((session) => (
               <div
                 key={session.id}
-                className="flex justify-between items-center py-3 border-t"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100"
               >
-                <div>
-                  <div className="text-gray-700">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">
+                    {session.sleep_type === 'night' ? '🌙' : '☀️'}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold text-gray-800">
                     {new Date(session.start_time).toLocaleDateString('en-US', {
                       weekday: 'short',
                       month: 'short',
@@ -176,13 +226,13 @@ export default function HistoryClient({ child, sleepSessions }: Props) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-bold text-purple-600">
                     {session.end_time
                       ? formatDuration(session.start_time, session.end_time)
                       : 'In progress'}
                   </div>
                   {session.sleep_type && (
-                    <div className="text-sm text-gray-600 capitalize">
+                    <div className="text-xs text-gray-500 capitalize mt-1">
                       {session.sleep_type}
                     </div>
                   )}
@@ -191,9 +241,11 @@ export default function HistoryClient({ child, sleepSessions }: Props) {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-center py-8">
-            No sleep sessions recorded yet
-          </p>
+          <div className="text-center py-12">
+            <span className="text-5xl mb-3 block">😴</span>
+            <p className="text-gray-500">No sleep sessions recorded yet</p>
+            <p className="text-sm text-gray-400 mt-1">Start tracking to see your history</p>
+          </div>
         )}
       </div>
     </div>

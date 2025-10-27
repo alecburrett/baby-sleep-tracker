@@ -37,22 +37,29 @@ export default async function HistoryPage() {
     .order('start_time', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100">
+        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="text-indigo-600 hover:text-indigo-800 font-medium"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-purple-600 hover:bg-purple-100 transition-colors font-medium"
           >
-            ← Back to Dashboard
+            <span>←</span>
+            <span>Back</span>
           </Link>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center">
+              <span className="text-xl">📊</span>
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Sleep History
+            </h1>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Sleep History</h1>
-
+      <main className="max-w-4xl mx-auto px-6 py-8">
         <HistoryClient
           child={child}
           sleepSessions={sleepSessions || []}

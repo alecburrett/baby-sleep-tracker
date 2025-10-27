@@ -46,17 +46,21 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-lg border border-purple-100 p-8">
         <div className="text-center mb-8">
-          <span className="text-6xl mb-4 block">👶</span>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome!</h1>
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg">
+            <span className="text-6xl">👶</span>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            Welcome!
+          </h1>
           <p className="text-gray-600">Let's set up your baby's profile</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
               Baby's Name
             </label>
             <input
@@ -64,13 +68,13 @@ export default function SetupPage() {
               name="name"
               type="text"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border-2 border-purple-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               placeholder="Enter baby's name"
             />
           </div>
 
           <div>
-            <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="birthDate" className="block text-sm font-semibold text-gray-700 mb-2">
               Birth Date
             </label>
             <input
@@ -79,22 +83,23 @@ export default function SetupPage() {
               type="date"
               required
               max={new Date().toISOString().split('T')[0]}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border-2 border-purple-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-              {error}
+            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm flex items-center gap-3">
+              <span className="text-xl">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 px-6 rounded-full font-bold text-lg hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-4 focus:ring-purple-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 disabled:transform-none shadow-lg"
           >
-            {loading ? 'Creating profile...' : 'Continue'}
+            {loading ? '✨ Creating profile...' : 'Continue →'}
           </button>
         </form>
       </div>
