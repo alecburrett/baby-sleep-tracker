@@ -4,6 +4,10 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { logout } from '@/app/actions/auth'
 import { Database } from '@/lib/types/database'
+import FAB from '../components/FAB'
+import NextActionCard from '../components/NextActionCard'
+import InsightsWidget from '../components/InsightsWidget'
+import ProgressIndicators from '../components/ProgressIndicators'
 
 type Child = Database['public']['Tables']['children']['Row']
 type SleepSession = Database['public']['Tables']['sleep_sessions']['Row']
@@ -13,6 +17,7 @@ interface Props {
   user: User
   child: Child
   todaySessions: SleepSession[]
+  yesterdaySessions: SleepSession[]
   activeSleepSession: SleepSession | null
   recentSessions: SleepSession[]
 }
@@ -21,6 +26,7 @@ export default function DashboardClient({
   user,
   child,
   todaySessions,
+  yesterdaySessions,
   activeSleepSession: initialActiveSleepSession,
   recentSessions,
 }: Props) {
@@ -131,93 +137,63 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24">
+      {/* Header - Simplified */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
               <span className="text-xl">✨</span>
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Sleep Tracker
-            </h1>
+            <div>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {child.name}
+              </h1>
+              <p className="text-xs text-gray-600">{ageInMonths} months old</p>
+            </div>
           </div>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-full text-sm font-medium text-purple-600 hover:bg-purple-100 transition-colors"
-            >
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <div className="text-2xl font-bold text-purple-600">{todaysSleepHours}h</div>
+              <p className="text-xs text-gray-500">today</p>
+            </div>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="p-2 hover:bg-purple-100 rounded-full transition-colors"
+                aria-label="Logout"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        {/* Child Profile Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 flex items-center justify-center border-4 border-white shadow-lg">
-              <span className="text-4xl">👶</span>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-800">{child.name}</h2>
-              <p className="text-purple-600 font-medium">{ageInMonths} months old</p>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-purple-600">{todaysSleepHours}h</div>
-              <p className="text-xs text-gray-500">today</p>
-            </div>
-          </div>
-        </div>
+      <main className="max-w-4xl mx-auto px-6 py-6">
+        {/* Next Action Card - Top Priority */}
+        <NextActionCard
+          recentSessions={recentSessions}
+          activeSleepSession={activeSleepSession}
+          childAgeInMonths={ageInMonths}
+        />
 
-        {/* Sleep Status Card */}
-        <div className={`rounded-3xl shadow-lg p-8 mb-6 border-4 ${
-          activeSleepSession
-            ? 'bg-gradient-to-br from-blue-100 to-blue-200 border-blue-300'
-            : 'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-300'
-        }`}>
-          <div className="text-center">
-            <div className="mb-4">
-              <span className="text-7xl drop-shadow-lg">
-                {activeSleepSession ? '😴' : '🌟'}
-              </span>
-            </div>
+        {/* Progress Indicators */}
+        <ProgressIndicators
+          todaySessions={todaySessions}
+          yesterdaySessions={yesterdaySessions}
+          childAgeInMonths={ageInMonths}
+        />
 
-            {activeSleepSession ? (
-              <>
-                <h3 className="text-3xl font-bold text-blue-900 mb-2">Sleeping...</h3>
-                <p className="text-blue-700 mb-1">Since {formatTime(activeSleepSession.start_time)}</p>
-                <div className="inline-block bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
-                  <p className="text-2xl font-bold text-blue-600">{currentSleepDuration}</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3 className="text-3xl font-bold text-purple-900 mb-2">Awake & Happy</h3>
-                <p className="text-purple-700 mb-6">Ready to track the next sleep</p>
-              </>
-            )}
-
-            <button
-              onClick={handleSleepToggle}
-              disabled={loading}
-              className={`w-full py-5 px-8 rounded-full text-xl font-bold text-white shadow-xl transition-all transform hover:scale-105 active:scale-95 ${
-                activeSleepSession
-                  ? 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600'
-                  : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-              } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
-            >
-              {loading
-                ? '⏳ Processing...'
-                : activeSleepSession
-                ? '✓ Wake Up'
-                : '+ Start Sleep'}
-            </button>
-          </div>
-        </div>
+        {/* Insights Widget */}
+        <InsightsWidget
+          child={child}
+          todaySessions={todaySessions}
+          recentSessions={recentSessions}
+        />
 
         {/* Today's Sessions */}
         {todaySessions.length > 0 && (
@@ -226,11 +202,11 @@ export default function DashboardClient({
               <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
                 <span className="text-lg">📋</span>
               </div>
-              <h3 className="text-lg font-bold text-gray-800">Today's Sessions</h3>
+              <h3 className="text-lg font-bold text-gray-800">Today's Sleep Sessions</h3>
             </div>
 
             <div className="space-y-3">
-              {todaySessions.map((session, idx) => (
+              {todaySessions.slice(0, 5).map((session) => (
                 <div
                   key={session.id}
                   className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100"
@@ -247,7 +223,7 @@ export default function DashboardClient({
                     <p className="font-semibold text-gray-800">
                       {session.end_time
                         ? formatDuration(session.start_time, session.end_time)
-                        : 'In progress'}
+                        : currentSleepDuration || 'In progress'}
                     </p>
                     <p className="text-sm text-gray-600">
                       {formatTime(session.start_time)}
@@ -261,42 +237,59 @@ export default function DashboardClient({
                 </div>
               ))}
             </div>
-          </div>
-        )}
 
-        {todaySessions.length === 0 && !activeSleepSession && (
-          <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-8 mb-6 text-center">
-            <span className="text-5xl mb-4 block">🌙</span>
-            <p className="text-gray-500">No sleep sessions yet today</p>
-            <p className="text-sm text-gray-400 mt-1">Tap the button above to start tracking</p>
+            {todaySessions.length > 5 && (
+              <button
+                onClick={() => router.push('/dashboard/history')}
+                className="w-full mt-4 py-2 text-sm text-purple-600 hover:text-purple-700 font-semibold"
+              >
+                View all {todaySessions.length} sessions →
+              </button>
+            )}
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={() => router.push('/dashboard/history')}
-            className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 text-center hover:shadow-md hover:border-purple-200 transition-all"
-          >
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">📊</span>
+        <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-lg">🎯</span>
             </div>
-            <h3 className="font-bold text-gray-800 mb-1">History</h3>
-            <p className="text-xs text-gray-500">View patterns</p>
-          </button>
+            <h3 className="text-lg font-bold text-gray-800">Quick Access</h3>
+          </div>
 
-          <button
-            onClick={() => router.push('/dashboard/insights')}
-            className="bg-white rounded-3xl shadow-sm border border-purple-100 p-6 text-center hover:shadow-md hover:border-purple-200 transition-all"
-          >
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">💡</span>
-            </div>
-            <h3 className="font-bold text-gray-800 mb-1">AI Insights</h3>
-            <p className="text-xs text-gray-500">Get tips</p>
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => router.push('/dashboard/history')}
+              className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 hover:border-blue-200 transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center mb-2">
+                <span className="text-xl">📊</span>
+              </div>
+              <p className="font-bold text-gray-800 text-sm">History</p>
+              <p className="text-xs text-gray-600">View trends</p>
+            </button>
+
+            <button
+              onClick={() => router.push('/dashboard/insights')}
+              className="p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 hover:border-purple-200 transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mb-2">
+                <span className="text-xl">💡</span>
+              </div>
+              <p className="font-bold text-gray-800 text-sm">Full Insights</p>
+              <p className="text-xs text-gray-600">Detailed analysis</p>
+            </button>
+          </div>
         </div>
       </main>
+
+      {/* Floating Action Button (FAB) - Always accessible */}
+      <FAB
+        isActive={!!activeSleepSession}
+        loading={loading}
+        onClick={handleSleepToggle}
+      />
     </div>
   )
 }
