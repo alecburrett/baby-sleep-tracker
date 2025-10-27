@@ -93,10 +93,16 @@ export default function DashboardClient({
           body: JSON.stringify({ sessionId: activeSleepSession.id }),
         })
 
-        if (response.ok) {
-          setActiveSleepSession(null)
-          router.refresh()
+        const data = await response.json()
+
+        if (!response.ok) {
+          console.error('Error ending sleep:', data.error || 'Unknown error')
+          alert(`Failed to end sleep: ${data.error || 'Unknown error'}`)
+          return
         }
+
+        setActiveSleepSession(null)
+        router.refresh()
       } else {
         // Start new sleep session
         const response = await fetch('/api/sleep/start', {
@@ -105,14 +111,20 @@ export default function DashboardClient({
           body: JSON.stringify({ childId: child.id }),
         })
 
-        if (response.ok) {
-          const data = await response.json()
-          setActiveSleepSession(data.session)
-          router.refresh()
+        const data = await response.json()
+
+        if (!response.ok) {
+          console.error('Error starting sleep:', data.error || 'Unknown error')
+          alert(`Failed to start sleep: ${data.error || 'Unknown error'}`)
+          return
         }
+
+        setActiveSleepSession(data.session)
+        router.refresh()
       }
     } catch (error) {
       console.error('Error toggling sleep:', error)
+      alert('Network error: Could not connect to server')
     } finally {
       setLoading(false)
     }
